@@ -2,29 +2,22 @@ package sabercache
 
 import (
 	"sabercache/cachememory"
-	"sync"
 )
 
 type cache struct {
-	mu            sync.RWMutex
 	cachememory   cachememory.CacheMemory
 	capacity      int64
 	cacheStrategy string
 }
 
 func newCache(capacity int64, cacheStrategy string) *cache {
-	c := &cache{
+	return &cache{
 		capacity:      capacity,
 		cacheStrategy: cacheStrategy,
 	}
-
-	return c
 }
 
-func (c *cache) add(key string, value ByteView) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-
+func (c *cache) SetWithoutTTL(key string, value ByteView) {
 	if c.cachememory == nil {
 		switch {
 		case c.cacheStrategy == "lfu":
@@ -38,16 +31,34 @@ func (c *cache) add(key string, value ByteView) {
 		}
 	}
 
-	c.cachememory.Add(key, value)
+	c.cachememory.SetWithoutTTL(key, value)
 }
-func (c *cache) get(key string) (ByteView, bool) {
+
+func (c *cache) SetWithTTL(key string, value ByteView, expireSecond int64) {
+	if c.cachememory == nil {
+		switch {
+		case c.cacheStrategy == "lfu":
+			c.cachememory = cachememory.NewLFUCache(c.capacity, nil)
+		case c.cacheStrategy == "fifo":
+			c.cachememory = cachememory.NewFIFOCache(c.capacity, nil)
+		case c.cacheStrategy == "lru":
+			c.cachememory = cachememory.NewLRUCache(c.capacity, nil)
+		default:
+			c.cachememory = cachememory.NewLFUCache(c.capacity, nil)
+		}
+	}
+	c.cachememory.SetWithTTL(key, value, expireSecond)
+}
+func (c *cache) Get(key string) (ByteView, bool) {
 	if c.cachememory == nil {
 		return ByteView{}, false
 	}
-	c.mu.RLock()
-	defer c.mu.RUnlock()
 	if v, ok := c.cachememory.Get(key); ok {
 		return v.(ByteView), true
 	}
 	return ByteView{}, false
+}
+
+func (c *cache) TTL(key string) int {
+	return c.TTL(key)
 }

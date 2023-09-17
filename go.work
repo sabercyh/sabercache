@@ -1,0 +1,8 @@
+go 1.19
+
+use (
+	.
+	./sabercache_server
+	./sabercache_server/server
+	./sabercache_client
+)

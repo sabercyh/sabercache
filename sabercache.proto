@@ -1,0 +1,47 @@
+//protoc --go_out=. --go-grpc_out=. *.proto
+syntax = "proto3";
+package sabercachepb;
+
+option go_package = "/sabercachepb";
+
+message GetRequest {
+    string key = 1;
+}
+
+message GetResponse {
+    bytes value = 1;
+}
+message GetAllRequest {
+    
+}
+message KeyValue{
+    string key = 1 ;
+    bytes value = 2;
+}
+message GetAllResponse {
+    repeated KeyValue kv = 1;
+}
+message SetRequest {
+    string key = 1;
+    bytes value = 2;
+    int64 ttl = 3;
+}
+
+message SetResponse {
+    bool ok = 1;
+}
+
+message TTLRequest {
+    string key = 1;
+}
+
+message TTLResponse {
+    int64 ttl = 1;
+}
+
+service SaberCache {
+    rpc Get(GetRequest) returns (GetResponse);
+    rpc GetAll(GetAllRequest) returns (GetAllResponse);
+    rpc Set(SetRequest) returns (SetResponse);
+    rpc TTL(TTLRequest) returns (TTLResponse);
+}

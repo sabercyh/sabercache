@@ -29,5 +29,4 @@ func InitConst() {
 	}
 	RPCAddr = viper.GetString("RPCAddr")
 	CacheStrategy = viper.GetString("CacheStrategy")
-	fmt.Println(RPCAddr, CacheStrategy, DefaultEtcdConfig)
 }

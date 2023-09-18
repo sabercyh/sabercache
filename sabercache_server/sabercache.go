@@ -34,6 +34,7 @@ func NewSaberCache(maxBytes int64, strategy string, ttl int64, retriever Retriev
 		ttl:       ttl,
 	}
 	sabercache = sc
+	sc.cache.Init()
 	return sc
 }
 func (sc *SaberCache) RegisterSvr(svr *Server) {
@@ -62,6 +63,9 @@ func (sc *SaberCache) Get(key string) (ByteView, error) {
 }
 func (sc *SaberCache) GetAll() (kv []*cachememory.Entity) {
 	return sc.cache.GetAll()
+}
+func (sc *SaberCache) Save() bool {
+	return sc.cache.Save()
 }
 
 func (sc *SaberCache) TTL(key string) int64 {

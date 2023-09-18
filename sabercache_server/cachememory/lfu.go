@@ -25,7 +25,7 @@ type ValueFreq struct {
 }
 
 func NewLFUCache(capacity int64, callback OnEliminated) *LFUCache {
-	return &LFUCache{
+	c := &LFUCache{
 		capacity:         capacity,
 		doublyLinkedList: list.New(),
 		Valuefreqmap:     make(map[*list.Element]*ValueFreq),
@@ -35,6 +35,8 @@ func NewLFUCache(capacity int64, callback OnEliminated) *LFUCache {
 		stop:             make(chan struct{}),
 		callback:         callback,
 	}
+	go c.ExpireKeyMonitor()
+	return c
 }
 
 func (c *LFUCache) Get(Key string) (Value, bool) {
@@ -85,7 +87,7 @@ func (c *LFUCache) GetAll() (kv []*Entity) {
 		if entity.ExpiredTime != -1 && entity.ExpiredTime <= time.Now().Unix() {
 			continue
 		}
-		kv = append(kv, &Entity{Key: entity.Key, Value: entity.Value})
+		kv = append(kv, entity)
 	}
 	return
 }

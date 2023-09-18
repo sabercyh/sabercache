@@ -18,7 +18,7 @@ type LRUCache struct {
 }
 
 func NewLRUCache(maxBytes int64, callback OnEliminated) *LRUCache {
-	return &LRUCache{
+	c := &LRUCache{
 		capacity:         maxBytes,
 		hashmap:          make(map[string]*list.Element),
 		timemap:          make(map[int64][]string),
@@ -26,6 +26,8 @@ func NewLRUCache(maxBytes int64, callback OnEliminated) *LRUCache {
 		callback:         callback,
 		stop:             make(chan struct{}),
 	}
+	go c.ExpireKeyMonitor()
+	return c
 }
 
 // Get 从缓存获取对应Key的Value。
@@ -54,7 +56,7 @@ func (c *LRUCache) GetAll() (kv []*Entity) {
 		if entity.ExpiredTime != -1 && entity.ExpiredTime <= time.Now().Unix() {
 			continue
 		}
-		kv = append(kv, &Entity{Key: entity.Key, Value: entity.Value})
+		kv = append(kv, entity)
 	}
 	return
 }

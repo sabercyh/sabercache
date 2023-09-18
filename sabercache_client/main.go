@@ -71,6 +71,12 @@ func process(conn net.Conn) {
 			}
 		case cmd[0] == "ttl" && len(cmd) != 1:
 			resp = []byte(fmt.Sprint(TTL(cmd[1])))
+		case cmd[0] == "save" && len(cmd) != 1:
+			if Save() {
+				resp = []byte("true")
+			} else {
+				resp = []byte("false")
+			}
 		case cmd[0] == "exit" && len(cmd) != 1:
 			break
 		default:
@@ -115,4 +121,12 @@ func TTL(key string) int64 {
 		return ttl
 	}
 	return ttl
+}
+func Save() bool {
+	ok, err := c.Save()
+	if err != nil {
+		log.Println(err)
+		return ok
+	}
+	return ok
 }

@@ -114,3 +114,9 @@ func (s *Server) TTL(ctx context.Context, in *pb.TTLRequest) (*pb.TTLResponse, e
 	resp.Ttl = sabercache.TTL(key)
 	return resp, nil
 }
+func (s *Server) Save(ctx context.Context, in *pb.SaveRequest) (*pb.SaveResponse, error) {
+	resp := &pb.SaveResponse{}
+	log.Printf("[sabercache_svr %s] Recv RPC Request save", s.addr)
+	resp.Ok = sabercache.Save()
+	return resp, nil
+}

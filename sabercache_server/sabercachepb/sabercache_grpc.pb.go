@@ -25,6 +25,7 @@ const (
 	SaberCache_GetAll_FullMethodName = "/sabercachepb.SaberCache/GetAll"
 	SaberCache_Set_FullMethodName    = "/sabercachepb.SaberCache/Set"
 	SaberCache_TTL_FullMethodName    = "/sabercachepb.SaberCache/TTL"
+	SaberCache_Save_FullMethodName   = "/sabercachepb.SaberCache/Save"
 )
 
 // SaberCacheClient is the client API for SaberCache service.
@@ -35,6 +36,7 @@ type SaberCacheClient interface {
 	GetAll(ctx context.Context, in *GetAllRequest, opts ...grpc.CallOption) (*GetAllResponse, error)
 	Set(ctx context.Context, in *SetRequest, opts ...grpc.CallOption) (*SetResponse, error)
 	TTL(ctx context.Context, in *TTLRequest, opts ...grpc.CallOption) (*TTLResponse, error)
+	Save(ctx context.Context, in *SaveRequest, opts ...grpc.CallOption) (*SaveResponse, error)
 }
 
 type saberCacheClient struct {
@@ -81,6 +83,15 @@ func (c *saberCacheClient) TTL(ctx context.Context, in *TTLRequest, opts ...grpc
 	return out, nil
 }
 
+func (c *saberCacheClient) Save(ctx context.Context, in *SaveRequest, opts ...grpc.CallOption) (*SaveResponse, error) {
+	out := new(SaveResponse)
+	err := c.cc.Invoke(ctx, SaberCache_Save_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SaberCacheServer is the server API for SaberCache service.
 // All implementations must embed UnimplementedSaberCacheServer
 // for forward compatibility
@@ -89,6 +100,7 @@ type SaberCacheServer interface {
 	GetAll(context.Context, *GetAllRequest) (*GetAllResponse, error)
 	Set(context.Context, *SetRequest) (*SetResponse, error)
 	TTL(context.Context, *TTLRequest) (*TTLResponse, error)
+	Save(context.Context, *SaveRequest) (*SaveResponse, error)
 	mustEmbedUnimplementedSaberCacheServer()
 }
 
@@ -107,6 +119,9 @@ func (UnimplementedSaberCacheServer) Set(context.Context, *SetRequest) (*SetResp
 }
 func (UnimplementedSaberCacheServer) TTL(context.Context, *TTLRequest) (*TTLResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method TTL not implemented")
+}
+func (UnimplementedSaberCacheServer) Save(context.Context, *SaveRequest) (*SaveResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Save not implemented")
 }
 func (UnimplementedSaberCacheServer) mustEmbedUnimplementedSaberCacheServer() {}
 
@@ -193,6 +208,24 @@ func _SaberCache_TTL_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SaberCache_Save_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SaveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SaberCacheServer).Save(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SaberCache_Save_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SaberCacheServer).Save(ctx, req.(*SaveRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SaberCache_ServiceDesc is the grpc.ServiceDesc for SaberCache service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -215,6 +248,10 @@ var SaberCache_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TTL",
 			Handler:    _SaberCache_TTL_Handler,
+		},
+		{
+			MethodName: "Save",
+			Handler:    _SaberCache_Save_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

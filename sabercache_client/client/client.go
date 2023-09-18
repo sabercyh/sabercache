@@ -127,3 +127,28 @@ func (c *Client) TTL(key string) (int64, error) {
 	log.Printf("get ttl %s from %s\n", key, peer)
 	return resp.Ttl, nil
 }
+
+func (c *Client) Save() (ok bool, err error) {
+	cli, err := clientv3.New(defaultEtcdConfig)
+	if err != nil {
+		return
+	}
+	defer cli.Close()
+	for _, peer := range c.peers {
+		conn, err := EtcdDial(cli, peer)
+		if err != nil {
+			return false, err
+		}
+		defer conn.Close()
+		grpcClient := pb.NewSaberCacheClient(conn)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		resp, err := grpcClient.Save(ctx, &pb.SaveRequest{})
+		if !resp.Ok || err != nil {
+			return false, fmt.Errorf("could not save peer %s", peer)
+		}
+		log.Printf("save %s\n", peer)
+	}
+
+	return true, nil
+}

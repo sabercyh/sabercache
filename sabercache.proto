@@ -39,9 +39,17 @@ message TTLResponse {
     int64 ttl = 1;
 }
 
+message SaveRequest {
+}
+
+message SaveResponse {
+    bool ok = 1;
+}
+
 service SaberCache {
     rpc Get(GetRequest) returns (GetResponse);
     rpc GetAll(GetAllRequest) returns (GetAllResponse);
     rpc Set(SetRequest) returns (SetResponse);
     rpc TTL(TTLRequest) returns (TTLResponse);
+    rpc Save(SaveRequest) returns (SaveResponse);
 }

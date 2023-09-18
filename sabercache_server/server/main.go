@@ -1,5 +1,6 @@
 package main
 
+//./main --rpcAddr 127.0.0.1:20001 --cacheStrategy lru
 // go run main.go --rpcAddr 127.0.0.1:20001 --cacheStrategy lru
 //CGO_ENABLED=0  GOOS=linux  GOARCH=amd64  go build main.go
 import (

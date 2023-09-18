@@ -25,6 +25,7 @@ func main() {
 		fmt.Println("listen failed , err :", err)
 		return
 	}
+	log.Println("listened at : ", tcpAddr)
 	c = client.NewClient()
 	for {
 		conn, err := listen.Accept()
@@ -32,6 +33,7 @@ func main() {
 			fmt.Println("accepted failed , err:", err)
 			continue
 		}
+		log.Println("accepted conn : ", tcpAddr)
 		go process(conn)
 	}
 }

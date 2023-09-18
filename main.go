@@ -16,7 +16,7 @@ func main() {
 	flag.Parse()
 	conn, err := net.Dial("tcp", tcpAddr)
 	if err != nil {
-		fmt.Println("err:", err)
+		fmt.Println("dial err:", err)
 		return
 	}
 	defer conn.Close()

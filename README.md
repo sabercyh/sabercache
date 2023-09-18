@@ -1,6 +1,6 @@
 # 分布式缓存系统
 ## 系统结构
-![系统结构图](/assets/System structure.png)
+![系统结构图](/assets/System_structure.png)
 ## Start
 ```
 go run main.go --tcpAddr 指定地址

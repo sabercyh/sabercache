@@ -1,6 +1,6 @@
 // example.go file
 // 运行前，你需要在本地启动Etcd实例，作为服务中心。
-
+// CGO_ENABLED=0  GOOS=linux  GOARCH=amd64  go build main.go
 package main
 
 import (

@@ -1,4 +1,4 @@
-# 分布式缓存系统
+# Distributed cache system
 ## 系统结构
 ![系统结构图](/assets/System_structure.png)
 ## Start

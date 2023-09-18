@@ -1,0 +1,4 @@
+TCPAddr: "127.0.0.1:20001"
+EtcdEndpoints: "127.0.0.1:2379"
+EtcdDialTimeout: 5
+Replicas : 50

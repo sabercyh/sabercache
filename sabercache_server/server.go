@@ -6,25 +6,11 @@ import (
 	"log"
 	"net"
 	pb "sabercache_server/sabercachepb"
+	"sabercache_server/util"
 	"strings"
 	"sync"
-	"time"
 
-	"sabercache_server/registry"
-
-	clientv3 "go.etcd.io/etcd/client/v3"
 	"google.golang.org/grpc"
-)
-
-const (
-	defaultAddr = "127.0.0.1:6324"
-)
-
-var (
-	defaultEtcdConfig = clientv3.Config{
-		Endpoints:   []string{"localhost:2379"},
-		DialTimeout: 5 * time.Second,
-	}
 )
 
 type Server struct {
@@ -35,11 +21,10 @@ type Server struct {
 	stopSignal chan error
 }
 
-func NewServer(addr string) (*Server, error) {
-	if addr == "" {
-		addr = defaultAddr
-	}
-	if !validPeerAddr(addr) {
+func NewServer() (*Server, error) {
+	util.InitConst()
+	addr := util.RPCAddr
+	if !util.ValidPeerAddr(addr) {
 		return nil, fmt.Errorf("invalid addr %s , it should be x.x.x.x:port", addr)
 	}
 	return &Server{addr: addr}, nil
@@ -63,7 +48,7 @@ func (s *Server) Start() error {
 	pb.RegisterSaberCacheServer(grpcServer, s)
 
 	go func() {
-		err := registry.Register("sabercache", s.addr, s.stopSignal)
+		err := Register("sabercache", s.addr, s.stopSignal)
 		if err != nil {
 			log.Fatalf(err.Error())
 		}

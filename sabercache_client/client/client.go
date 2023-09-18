@@ -6,13 +6,10 @@ import (
 	"log"
 	"sabercache_client/consistenthash"
 	pb "sabercache_client/sabercachepb"
+	"sabercache_client/util"
 	"time"
 
 	clientv3 "go.etcd.io/etcd/client/v3"
-)
-
-const (
-	replicas = 50
 )
 
 type Client struct {
@@ -24,7 +21,7 @@ func NewClient() *Client {
 	peers := DiscoverPeers()
 	log.Println(peers)
 	c := &Client{peers: peers}
-	c.consistenthash = consistenthash.New(replicas, nil)
+	c.consistenthash = consistenthash.New(util.Replicas, nil)
 	c.consistenthash.Register(peers)
 	return c
 }

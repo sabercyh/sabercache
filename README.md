@@ -15,4 +15,6 @@ get v2
 ttl v2
 
 getall
+
+exit
 ```

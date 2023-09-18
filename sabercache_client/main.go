@@ -5,11 +5,11 @@ package main
 
 import (
 	"bufio"
-	"flag"
 	"fmt"
 	"log"
 	"net"
 	"sabercache_client/client"
+	"sabercache_client/util"
 	"strconv"
 	"strings"
 )
@@ -17,15 +17,13 @@ import (
 var c *client.Client
 
 func main() {
-	var tcpAddr string
-	flag.StringVar(&tcpAddr, "tcpAddr", "127.0.0.1:20011", "tcp地址")
-	flag.Parse()
-	listen, err := net.Listen("tcp", tcpAddr)
+	util.InitConst()
+	listen, err := net.Listen("tcp", util.TCPAddr)
 	if err != nil {
 		fmt.Println("listen failed , err :", err)
 		return
 	}
-	log.Println("listened at : ", tcpAddr)
+	log.Println("listened at : ", util.TCPAddr)
 	c = client.NewClient()
 	for {
 		conn, err := listen.Accept()
@@ -33,7 +31,7 @@ func main() {
 			fmt.Println("accepted failed , err:", err)
 			continue
 		}
-		log.Println("accepted conn : ", tcpAddr)
+		log.Println("accepted conn : ", util.TCPAddr)
 		go process(conn)
 	}
 }
@@ -73,6 +71,8 @@ func process(conn net.Conn) {
 			}
 		case cmd[0] == "ttl" && len(cmd) != 1:
 			resp = []byte(fmt.Sprint(TTL(cmd[1])))
+		case cmd[0] == "exit" && len(cmd) != 1:
+			break
 		default:
 			resp = []byte("Please enter the command in the correct format!")
 		}

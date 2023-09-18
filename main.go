@@ -12,7 +12,7 @@ import (
 
 func main() {
 	var tcpAddr string
-	flag.StringVar(&tcpAddr, "tcpAddr", "127.0.0.1:20011", "tcp地址")
+	flag.StringVar(&tcpAddr, "tcpAddr", "0.0.0.0:1001", "tcp地址")
 	flag.Parse()
 	conn, err := net.Dial("tcp", tcpAddr)
 	if err != nil {
@@ -24,11 +24,11 @@ func main() {
 	for {
 		input, _ := inputReader.ReadString('\n')
 		inputInfo := strings.Trim(input, "\n")
-		if strings.ToUpper(inputInfo) == "Q" {
-			return
-		}
 		_, err := conn.Write([]byte(inputInfo))
 		if err != nil {
+			return
+		}
+		if strings.ToUpper(inputInfo) == "EXIT" {
 			return
 		}
 		buf := [512]byte{}

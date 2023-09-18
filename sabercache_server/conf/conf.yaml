@@ -1,0 +1,4 @@
+CacheStrategy: "lru"
+RPCAddr: "0.0.0.0:10001"
+EtcdEndpoints: "0.0.0.0:2379"
+EtcdDialTimeout: 5

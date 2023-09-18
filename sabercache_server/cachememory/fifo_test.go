@@ -1,6 +1,8 @@
 package cachememory
 
+// go test -v -run 函数名
 import (
+	"fmt"
 	"reflect"
 	"strconv"
 	"testing"
@@ -34,8 +36,32 @@ func TestFIFOGet(t *testing.T) {
 			t.Fatalf("cache miss key2 failed")
 		}
 	})
-
 }
+
+func TestFIFOGetAll(t *testing.T) {
+	var cache CacheMemory = NewFIFOCache(int64(1024), nil)
+	go cache.ExpireKeyMonitor()
+	defer cache.Stop()
+	t.Run("SetWithoutTTL", func(t *testing.T) {
+		cache.SetWithoutTTL("key1", String("value1"))
+		cache.SetWithoutTTL("key2", String("value2"))
+		entity := cache.GetAll()
+		if len(entity) != 2 {
+			t.Fatalf("getall failed!")
+		}
+		fmt.Println(*entity[0], *entity[1])
+	})
+	t.Run("SetWithTTL", func(t *testing.T) {
+		cache.SetWithTTL("key1", String("value1"), 10)
+		cache.SetWithTTL("key2", String("value2"), 10)
+		entity := cache.GetAll()
+		if len(entity) != 2 {
+			t.Fatalf("getall failed!")
+		}
+		fmt.Println(*entity[0], *entity[1])
+	})
+}
+
 func TestFIFOSetWithTTL(t *testing.T) {
 	var cache CacheMemory = NewFIFOCache(int64(1024), nil)
 	go cache.ExpireKeyMonitor()

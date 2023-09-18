@@ -3,6 +3,7 @@ package client
 import (
 	"context"
 	"fmt"
+	"log"
 	"sabercache_client/consistenthash"
 	pb "sabercache_client/sabercachepb"
 	"time"
@@ -21,7 +22,7 @@ type Client struct {
 
 func NewClient() *Client {
 	peers := DiscoverPeers()
-	fmt.Println(peers)
+	log.Println(peers)
 	c := &Client{peers: peers}
 	c.consistenthash = consistenthash.New(replicas, nil)
 	c.consistenthash.Register(peers)
@@ -48,7 +49,7 @@ func (c *Client) Get(key string) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("could not get %s from peer %s", key, peer)
 	}
-
+	log.Printf("get %s from %s\n", key, peer)
 	return resp.GetValue(), nil
 }
 
@@ -71,6 +72,7 @@ func (c *Client) GetAll() (respKV []*pb.KeyValue, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("could not getall from peer %s", peer)
 		}
+		log.Printf("getall from %s\n", peer)
 		respKV = append(respKV, resp.Kv...)
 	}
 
@@ -100,7 +102,7 @@ func (c *Client) Set(key string, value []byte, ttl int64) (bool, error) {
 	if err != nil {
 		return false, fmt.Errorf("could not set %s to peer %s", key, peer)
 	}
-
+	log.Printf("set %s to %s\n", key, peer)
 	return resp.Ok, nil
 }
 
@@ -125,6 +127,6 @@ func (c *Client) TTL(key string) (int64, error) {
 	if err != nil {
 		return -2, fmt.Errorf("could not set %s to peer %s", key, peer)
 	}
-
+	log.Printf("get ttl %s from %s\n", key, peer)
 	return resp.Ttl, nil
 }

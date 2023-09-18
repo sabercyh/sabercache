@@ -18,20 +18,20 @@ func (f RetrieverFunc) retrieve(key string) ([]byte, error) {
 }
 
 type SaberCache struct {
-	cache      *Cache
-	server     *Server
-	retriever  Retriever
-	expireTime int64
+	cache     *Cache
+	server    *Server
+	retriever Retriever
+	ttl       int64
 }
 
-func NewSaberCache(maxBytes int64, strategy string, expireTime int64, retriever Retriever) *SaberCache {
+func NewSaberCache(maxBytes int64, strategy string, ttl int64, retriever Retriever) *SaberCache {
 	if retriever == nil {
 		panic("Group retriever must be existed!")
 	}
 	sc := &SaberCache{
-		cache:      newCache(maxBytes, strategy),
-		retriever:  retriever,
-		expireTime: expireTime,
+		cache:     newCache(maxBytes, strategy),
+		retriever: retriever,
+		ttl:       ttl,
 	}
 	sabercache = sc
 	return sc
@@ -43,7 +43,7 @@ func (sc *SaberCache) RegisterSvr(svr *Server) {
 	sc.server = svr
 }
 func (sc *SaberCache) Set(key string, value ByteView, ttl int64) bool {
-	if ttl == -2 {
+	if ttl == -1 {
 		sc.cache.SetWithoutTTL(key, value)
 	} else {
 		sc.cache.SetWithTTL(key, value, ttl)
@@ -61,7 +61,7 @@ func (sc *SaberCache) Get(key string) (ByteView, error) {
 	return sc.load(key)
 }
 func (sc *SaberCache) GetAll() (kv []*cachememory.Entity) {
-	return sc.GetAll()
+	return sc.cache.GetAll()
 }
 
 func (sc *SaberCache) TTL(key string) int64 {
@@ -69,7 +69,7 @@ func (sc *SaberCache) TTL(key string) int64 {
 }
 func (sc *SaberCache) load(key string) (ByteView, error) {
 
-	return ByteView{}, nil
+	return sc.getLocally(key)
 }
 
 // getLocally 本地向Retriever取回数据并填充缓存
@@ -85,5 +85,5 @@ func (sc *SaberCache) getLocally(key string) (ByteView, error) {
 
 // populateCache 提供填充缓存的能力
 func (sc *SaberCache) populateCache(key string, value ByteView) {
-	sc.cache.SetWithTTL(key, value, sc.expireTime)
+	sc.cache.SetWithTTL(key, value, sc.ttl)
 }

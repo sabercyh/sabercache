@@ -19,7 +19,6 @@ var c *client.Client
 func main() {
 	var tcpAddr string
 	flag.StringVar(&tcpAddr, "tcpAddr", "127.0.0.1:20011", "tcp地址")
-	// 模拟MySQL数据库 用于peanutcache从数据源获取值
 	flag.Parse()
 	listen, err := net.Listen("tcp", tcpAddr)
 	if err != nil {
@@ -37,7 +36,7 @@ func main() {
 	}
 }
 func process(conn net.Conn) {
-	var res []byte
+	var resp []byte
 	defer conn.Close()
 	for {
 		reader := bufio.NewReader(conn)
@@ -49,32 +48,33 @@ func process(conn net.Conn) {
 		}
 		cmd := strings.Split(string(buf[:n]), " ")
 		switch {
-		case cmd[0] == "get":
-			res = Get(cmd[1])
+		case cmd[0] == "get" && len(cmd) != 1:
+			resp = Get(cmd[1])
 		case cmd[0] == "getall":
-			res = GetAll()
+			resp = GetAll()
 		case cmd[0] == "set" && len(cmd) == 3:
-			if Set(cmd[1], []byte(cmd[2]), -2) {
-				res = []byte("true")
+			if Set(cmd[1], []byte(cmd[2]), -1) {
+				resp = []byte("true")
 			} else {
-				res = []byte("false")
+				resp = []byte("false")
 			}
 		case cmd[0] == "set" && len(cmd) == 4:
 			ttl, err := strconv.Atoi(cmd[2])
 			if err != nil {
 				log.Println(err)
-				res = []byte("err!")
+				resp = []byte("err!")
 			}
-			if Set(cmd[1], []byte(cmd[2]), int64(ttl)) {
-				res = []byte("true")
+			if Set(cmd[1], []byte(cmd[3]), int64(ttl)) {
+				resp = []byte("true")
 			} else {
-				res = []byte("false")
+				resp = []byte("false")
 			}
-		case cmd[0] == "ttl":
-			res = []byte(fmt.Sprint(TTL(cmd[1])))
+		case cmd[0] == "ttl" && len(cmd) != 1:
+			resp = []byte(fmt.Sprint(TTL(cmd[1])))
+		default:
+			resp = []byte("Please enter the command in the correct format!")
 		}
-		fmt.Println(string(res))
-		conn.Write(res)
+		conn.Write(resp)
 	}
 }
 
@@ -94,7 +94,7 @@ func GetAll() []byte {
 		return []byte("err!")
 	}
 	for _, kv := range KeyValue {
-		str += fmt.Sprintf(kv.Key + ":" + string(kv.Value))
+		str += fmt.Sprintf(kv.Key + " : " + string(kv.Value) + "\n")
 	}
 	return []byte(str)
 }

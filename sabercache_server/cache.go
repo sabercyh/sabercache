@@ -58,7 +58,17 @@ func (c *Cache) Get(key string) (ByteView, bool) {
 	}
 	return ByteView{}, false
 }
+func (c *Cache) GetAll() (kv []*cachememory.Entity) {
+	if c.cachememory == nil {
+		return []*cachememory.Entity{}
+	}
+
+	return c.cachememory.GetAll()
+}
 
 func (c *Cache) TTL(key string) int64 {
+	if c.cachememory == nil {
+		return -2
+	}
 	return c.cachememory.TTL(key)
 }

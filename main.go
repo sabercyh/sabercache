@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"net"
 	"os"
@@ -9,7 +10,10 @@ import (
 )
 
 func main() {
-	conn, err := net.Dial("tcp", "127.0.0.1:20011")
+	var tcpAddr string
+	flag.StringVar(&tcpAddr, "tcpAddr", "127.0.0.1:20011", "tcp地址")
+	flag.Parse()
+	conn, err := net.Dial("tcp", tcpAddr)
 	if err != nil {
 		fmt.Println("err:", err)
 		return

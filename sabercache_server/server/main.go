@@ -18,7 +18,7 @@ func main() {
 		"Sam":  "567",
 	}
 	// 新建cache实例
-	sc := sabercache_server.NewSaberCache(2<<10, util.CacheStrategy, 30, sabercache_server.RetrieverFunc(
+	sc := sabercache_server.NewSaberCache(2<<10, util.CacheStrategy, sabercache_server.RetrieverFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[Mysql] search key", key)
 			if v, ok := mysql[key]; ok {

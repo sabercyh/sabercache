@@ -3,6 +3,7 @@ package sabercache_server
 import (
 	"fmt"
 	"log"
+	"math/rand"
 	"sabercache_server/cachememory"
 )
 
@@ -21,17 +22,15 @@ type SaberCache struct {
 	cache     *Cache
 	server    *Server
 	retriever Retriever
-	ttl       int64
 }
 
-func NewSaberCache(maxBytes int64, strategy string, ttl int64, retriever Retriever) *SaberCache {
+func NewSaberCache(maxBytes int64, strategy string, retriever Retriever) *SaberCache {
 	if retriever == nil {
 		panic("Group retriever must be existed!")
 	}
 	sc := &SaberCache{
 		cache:     newCache(maxBytes, strategy),
 		retriever: retriever,
-		ttl:       ttl,
 	}
 	sabercache = sc
 	sc.cache.Init()
@@ -89,5 +88,6 @@ func (sc *SaberCache) getLocally(key string) (ByteView, error) {
 
 // populateCache 提供填充缓存的能力
 func (sc *SaberCache) populateCache(key string, value ByteView) {
-	sc.cache.SetWithTTL(key, value, sc.ttl)
+	ttl := rand.Int63n(60)
+	sc.cache.SetWithTTL(key, value, ttl)
 }

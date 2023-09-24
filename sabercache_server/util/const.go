@@ -14,7 +14,7 @@ var (
 	CacheStrategy     string
 )
 
-func InitConst() {
+func init() {
 	viper.SetConfigFile("../conf/conf.yaml") // 指定配置文件路径
 	err := viper.ReadInConfig()              // 读取配置信息
 	if err != nil {                          // 读取配置信息失败

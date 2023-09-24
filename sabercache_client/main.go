@@ -17,7 +17,6 @@ import (
 var c *client.Client
 
 func main() {
-	util.InitConst()
 	listen, err := net.Listen("tcp", util.TCPAddr)
 	if err != nil {
 		fmt.Println("listen failed , err :", err)

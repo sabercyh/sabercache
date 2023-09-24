@@ -36,7 +36,7 @@ func newCache(capacity int64, cacheStrategy string) *Cache {
 	return c
 }
 func (c *Cache) Init() bool {
-	file, error := os.Open("./backup/backup.txt")
+	file, error := os.Open("../backup/backup.txt")
 	defer file.Close()
 	if error != nil {
 		log.Println(error)

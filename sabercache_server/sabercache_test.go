@@ -13,7 +13,7 @@ func TestGet(t *testing.T) {
 		"Jack": "589",
 		"Sam":  "567",
 	}
-	sc := NewSaberCache(2<<10, "fifo", 30, RetrieverFunc(
+	sc := NewSaberCache(2<<10, "fifo", RetrieverFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[Mysql] search key", key)
 			if v, ok := mysql[key]; ok {
@@ -44,7 +44,7 @@ func TestGetAll(t *testing.T) {
 		"Jack": "589",
 		"Sam":  "567",
 	}
-	sc := NewSaberCache(2<<10, "fifo", 30, RetrieverFunc(
+	sc := NewSaberCache(2<<10, "fifo", RetrieverFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[Mysql] search key", key)
 			if v, ok := mysql[key]; ok {
@@ -69,7 +69,7 @@ func TestSet(t *testing.T) {
 		"Jack": "589",
 		"Sam":  "567",
 	}
-	sc := NewSaberCache(2<<10, "fifo", 30, RetrieverFunc(
+	sc := NewSaberCache(2<<10, "fifo", RetrieverFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[Mysql] search key", key)
 			if v, ok := mysql[key]; ok {
@@ -97,7 +97,7 @@ func TestTTL(t *testing.T) {
 		"Jack": "589",
 		"Sam":  "567",
 	}
-	sc := NewSaberCache(2<<10, "fifo", 30, RetrieverFunc(
+	sc := NewSaberCache(2<<10, "fifo", RetrieverFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[Mysql] search key", key)
 			if v, ok := mysql[key]; ok {
@@ -125,7 +125,7 @@ func TestSave(t *testing.T) {
 		"Jack": "589",
 		"Sam":  "567",
 	}
-	sc := NewSaberCache(2<<10, "fifo", 30, RetrieverFunc(
+	sc := NewSaberCache(2<<10, "fifo", RetrieverFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[Mysql] search key", key)
 			if v, ok := mysql[key]; ok {
@@ -149,7 +149,7 @@ func TestInit(t *testing.T) {
 		"Jack": "589",
 		"Sam":  "567",
 	}
-	sc := NewSaberCache(2<<10, "fifo", 30, RetrieverFunc(
+	sc := NewSaberCache(2<<10, "fifo", RetrieverFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[Mysql] search key", key)
 			if v, ok := mysql[key]; ok {

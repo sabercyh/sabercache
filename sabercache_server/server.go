@@ -22,7 +22,6 @@ type Server struct {
 }
 
 func NewServer() (*Server, error) {
-	util.InitConst()
 	addr := util.RPCAddr
 	if !util.ValidPeerAddr(addr) {
 		return nil, fmt.Errorf("invalid addr %s , it should be x.x.x.x:port", addr)

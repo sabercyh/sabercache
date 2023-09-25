@@ -5,6 +5,7 @@ import (
 	"log"
 	"math/rand"
 	"sabercache_server/cachememory"
+	"sabercache_server/singleflight"
 )
 
 var sabercache *SaberCache
@@ -22,6 +23,7 @@ type SaberCache struct {
 	cache     *Cache
 	server    *Server
 	retriever Retriever
+	flight    *singleflight.Flight
 }
 
 func NewSaberCache(maxBytes int64, strategy string, retriever Retriever) *SaberCache {
@@ -31,6 +33,7 @@ func NewSaberCache(maxBytes int64, strategy string, retriever Retriever) *SaberC
 	sc := &SaberCache{
 		cache:     newCache(maxBytes, strategy),
 		retriever: retriever,
+		flight:    &singleflight.Flight{},
 	}
 	sabercache = sc
 	sc.cache.Init()
@@ -71,8 +74,14 @@ func (sc *SaberCache) TTL(key string) int64 {
 	return sc.cache.TTL(key)
 }
 func (sc *SaberCache) load(key string) (ByteView, error) {
+	view, err := sc.flight.Fly(key, func() (any, error) {
+		return sc.getLocally(key)
+	})
+	if err != nil {
+		return ByteView{}, err
+	}
+	return view.(ByteView), nil
 
-	return sc.getLocally(key)
 }
 
 // getLocally 本地向Retriever取回数据并填充缓存

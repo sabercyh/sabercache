@@ -4,27 +4,39 @@ package main
 // go run main.go --rpcAddr 127.0.0.1:20001 --cacheStrategy lru
 //CGO_ENABLED=0  GOOS=linux  GOARCH=amd64  go build main.go
 import (
+	"bufio"
 	"fmt"
+	"io"
 	"log"
+	"os"
 	"sabercache_server/util"
+	"strings"
 
 	"sabercache_server"
 )
 
 func main() {
-	var mysql = map[string]string{
-		"Tom":  "630",
-		"Jack": "589",
-		"Sam":  "567",
-	}
 	// 新建cache实例
 	sc := sabercache_server.NewSaberCache(2<<10, util.CacheStrategy, sabercache_server.RetrieverFunc(
 		func(key string) ([]byte, error) {
 			log.Println("[Mysql] search key", key)
-			if v, ok := mysql[key]; ok {
-				return []byte(v), nil
+			file, err := os.OpenFile("../file/mysql.txt", os.O_RDONLY, 0777)
+			if err != nil {
+				return []byte{}, err
 			}
-			return nil, fmt.Errorf("%s not exist", key)
+			reader := bufio.NewReader(file)
+			for {
+				bytes, _, err := reader.ReadLine()
+				if err == io.EOF {
+					return []byte{}, fmt.Errorf("not found the key:%s", key)
+				} else if err != nil {
+					return []byte{}, err
+				}
+				kv := strings.Split(string(bytes), " ")
+				if kv[0] == key {
+					return []byte(kv[1]), nil
+				}
+			}
 		}))
 	// New一个服务实例
 	svr, err := sabercache_server.NewServer()

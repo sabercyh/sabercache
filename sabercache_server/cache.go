@@ -16,6 +16,7 @@ type Cache struct {
 	cachememory   cachememory.CacheMemory
 	capacity      int64
 	cacheStrategy string
+	stop          chan struct{}
 }
 
 func newCache(capacity int64, cacheStrategy string) *Cache {
@@ -36,7 +37,7 @@ func newCache(capacity int64, cacheStrategy string) *Cache {
 	return c
 }
 func (c *Cache) Init() bool {
-	file, error := os.Open("../backup/backup.txt")
+	file, error := os.Open("../file/backup.txt")
 	defer file.Close()
 	if error != nil {
 		log.Println(error)
@@ -99,7 +100,7 @@ func (c *Cache) TTL(key string) int64 {
 
 func (c *Cache) Save() bool {
 	entitys := c.cachememory.GetAll()
-	file, error := os.OpenFile("./backup/backup.txt", os.O_RDWR|os.O_CREATE, 0766)
+	file, error := os.OpenFile("./backup/backup.txt", os.O_WRONLY|os.O_CREATE, 0766)
 	defer file.Close()
 	if error != nil {
 		log.Println(error)
@@ -114,4 +115,14 @@ func (c *Cache) Save() bool {
 		}
 	}
 	return true
+}
+func (c *Cache) BgSave() {
+	ticker := time.NewTicker(10 * time.Second)
+	select {
+	case <-c.stop:
+		return
+	case <-ticker.C:
+		c.Save()
+	}
+
 }

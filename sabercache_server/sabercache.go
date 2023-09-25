@@ -37,6 +37,7 @@ func NewSaberCache(maxBytes int64, strategy string, retriever Retriever) *SaberC
 	}
 	sabercache = sc
 	sc.cache.Init()
+	go sc.cache.BgSave()
 	return sc
 }
 func (sc *SaberCache) RegisterSvr(svr *Server) {
